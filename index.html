@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="nl" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMS-CampusStudio | The Contractor Growth & Van-Quoting Engine</title>
+  <meta name="description" content="Award-winning conversion web engine for ZZP contractors, builders, and tradesmen. Turn tire-kickers into high-ticket clients straight into your WhatsApp in 48 hours.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Cabinet+Grotesk:wght@800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti for celebrate -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              charcoal: '#0b0d10',
+              carbon: '#12151b',
+              surface: '#181d24',
+              surfaceBorder: '#27313f',
+              steel: '#8a99ad',
+              amber: '#ff6200',
+              flame: '#ff4500',
+              gold: '#f59e0b',
+              neon: '#25D366',
+              waGreen: '#128C7E',
+              waDark: '#075E54'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            display: ['"Cabinet Grotesk"', '"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          boxShadow: {
+            'glow-amber': '0 0 35px -5px rgba(255, 98, 0, 0.45)',
+            'glow-green': '0 0 35px -5px rgba(37, 211, 102, 0.45)',
+            'industrial': '0 20px 40px -15px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0d10;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27313f;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ff6200;
+    }
+
+    .industrial-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    .metal-plate {
+      background: radial-gradient(circle at 50% 0%, #1f2732 0%, #13171f 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+
+    .hazard-stripe {
+      background: repeating-linear-gradient(
+        -45deg,
+        #ff6200,
+        #ff6200 12px,
+        #12151b 12px,
+        #12151b 24px
+      );
+    }
+
+    .scanner-line {
+      animation: scan 3s ease-in-out infinite;
+    }
+
+    @keyframes scan {
+      0%, 100% { transform: translateY(0%); opacity: 0.2; }
+      50% { transform: translateY(100%); opacity: 0.9; }
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 2.5s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(255, 98, 0, 0.2); }
+      50% { box-shadow: 0 0 35px rgba(255, 98, 0, 0.65); }
+    }
+
+    /* Range slider custom styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #27313f;
+      height: 8px;
+      border-radius: 4px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ff6200;
+      cursor: pointer;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 12px rgba(255, 98, 0, 0.8);
+      transition: transform 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+  </style>
+</head>
+<body class="bg-brand-charcoal text-slate-100 font-sans antialiased selection:bg-brand-amber selection:text-black overflow-x-hidden">
+
+  <!-- Audio Context synthesizer for Industrial clicks & sparks -->
+  <script>
+    const SoundFx = {
+      enabled: false,
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+      },
+      playClink() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.exponentialRampToValueAtTime(220, now + 0.18);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } catch(e) {}
+      },
+      playSuccess() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + (i * 0.08));
+            gain.gain.setValueAtTime(0.2, now + (i * 0.08));
+            gain.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.08) + 0.35);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + (i * 0.08));
+            osc.stop(now + (i * 0.08) + 0.4);
+          });
+        } catch(e) {}
+      }
+    };
+  </script>
+
+  <!-- Top Ticker / Urgency Notice -->
+  <aside aria-label="Status notice" class="bg-black/90 border-b border-white/10 text-xs py-2 px-4 relative z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between text-slate-300">
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+        <span class="font-bold text-white tracking-wide uppercase">Amsterdam & NL Bouwregio</span>
+        <span class="hidden sm:inline text-slate-400">| 48h Turnaround Cap: 3 project slots remaining for this week</span>
+      </div>
+      <div class="flex items-center space-x-3 text-xs">
+        <span class="bg-brand-amber/20 text-brand-amber font-mono font-bold px-2 py-0.5 rounded border border-brand-amber/40">100% Zakelijk Aftrekbaar</span>
+        <button id="sfx-toggle" onclick="toggleAudio()" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-brand-surface border border-white/10 hover:border-brand-amber transition text-slate-300 hover:text-white" title="Toggle Sound Feedback">
+          <i data-lucide="volume-x" id="sfx-icon" class="w-3.5 h-3.5"></i>
+          <span id="sfx-label" class="hidden md:inline font-mono">Audio FX: OFF</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Navigation -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-brand-charcoal/85 border-b border-brand-surfaceBorder">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-amber to-brand-flame flex items-center justify-center font-display font-black text-black text-2xl shadow-glow-amber">
+          A
+        </div>
+        <div>
+          <span class="font-display font-black text-xl tracking-tight text-white block leading-tight">AMS<span class="text-brand-amber">.CAMPUS</span></span>
+          <span class="text-[10px] tracking-widest uppercase font-mono text-slate-400 font-semibold block">Craftsman Conversion Engine</span>
+        </div>
+      </div>
+
+      <nav class="hidden lg:flex items-center space-x-8 text-sm font-semibold text-slate-300">
+        <a href="#scrolly-knights" class="hover:text-brand-amber transition">De Erkenning</a>
+        <a href="#filter-leads" class="hover:text-brand-amber transition">Filter Slechte Klanten</a>
+        <a href="#van-demo" class="hover:text-brand-amber transition">Busje Offerte Machine</a>
+        <a href="#math-calculator" class="hover:text-brand-amber transition">Winst Calculator</a>
+        <a href="#pricing" class="hover:text-brand-amber transition">Geen Bullshit Tarief</a>
+      </nav>
+
+      <div class="flex items-center space-x-3">
+        <a href="#order-terminal" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/5 border border-white/15 hover:border-brand-amber text-white font-bold text-sm transition hover:bg-white/10">
+          <i data-lucide="calculator" class="w-4 h-4 text-brand-amber"></i>
+          <span>Bereken Jouw Misgelopen Omzet</span>
+        </a>
+        <a href="#order-terminal" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-neon hover:bg-emerald-400 text-slate-950 font-extrabold text-sm transition shadow-glow-green hover:scale-[1.02]">
+          <i data-lucide="message-circle" class="w-4 h-4 fill-slate-950"></i>
+          <span>Start in 48 Uur</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <section class="relative min-h-[92vh] flex items-center justify-center overflow-hidden industrial-grid py-16 sm:py-24">
+    <!-- Particle canvas for glowing welding embers / sparks -->
+    <canvas id="ember-canvas" class="absolute inset-0 pointer-events-none z-10 w-full h-full"></canvas>
+
+    <!-- Ambient glow gradients -->
+    <div class="absolute top-1/4 -left-40 w-96 h-96 bg-brand-amber/20 rounded-full blur-[130px] pointer-events-none"></div>
+    <div class="absolute bottom-10 right-0 w-96 h-96 bg-brand-neon/15 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-surface border border-brand-amber/40 text-brand-amber text-xs sm:text-sm font-bold tracking-wide uppercase mb-6 shadow-glow-amber">
+        <i data-lucide="hammer" class="w-4 h-4 animate-bounce"></i>
+        <span>Gebouwd voor ZZP Schilders, Timmerlieden, Installateurs & Aannemers</span>
+      </div>
+
+      <!-- Main Headline tapping into pride and frustration -->
+      <h1 class="font-display font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-white leading-[1.05] uppercase">
+        Je bouwt de wereld met <span class="bg-gradient-to-r from-brand-amber via-yellow-400 to-brand-flame bg-clip-text text-transparent">jouw handen.</span><br>
+        <span class="text-slate-300">Toch pakt je concurrent je winst.</span>
+      </h1>
+
+      <p class="mt-6 text-lg sm:text-2xl text-slate-300 max-w-3xl mx-auto font-medium leading-relaxed">
+        Terwijl jij om 06:15 uur op de ladder staat en 40 km rijdt voor een offerte die nergens toe leidt, scoort die gladde klusser uit je dorp alle rendabele <span class="text-white font-bold underline decoration-brand-amber decoration-4">€10.000+ klussen</span> via een simpele website.
+      </p>
+
+      <!-- Micro CTAs & Proof bullets -->
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#order-terminal" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-amber hover:bg-brand-flame text-black font-black text-lg transition duration-200 shadow-glow-amber flex items-center justify-center gap-3 transform hover:-translate-y-1">
+          <i data-lucide="zap" class="w-5 h-5 fill-black"></i>
+          <span>CLAIM JE KLUSSEN MACHINE (€75)</span>
+        </a>
+        <a href="#van-demo" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-surface hover:bg-brand-surfaceBorder border border-white/20 text-white font-bold text-base transition duration-200 flex items-center justify-center gap-2">
+          <i data-lucide="play-circle" class="w-5 h-5 text-brand-neon"></i>
+          <span>Bekijk de "Busje Offerte" Demo</span>
+        </a>
+      </div>
+
+      <!-- Trust Badges with Blue-Collar Proof -->
+      <div class="mt-14 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
+        <div class="flex items-center space-x-3 p-3 rounded-lg bg-black/40 border border-white/5">
+          <i data-lucide="shield-check" class="w-6 h-6 text-brand-neon flex-shrink-0"></i>
+          <div>
+            <div class="text-xs text-slate-400 font-bold uppercase">Geen Lock-in</div>
+            <div class="text-sm font-extrabold text-white">100% Jouw Eigendom</div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3 p-3 rounded-lg bg-black/40 border border-white/5">
+          <i data-lucide="clock-4" class="w-6 h-6 text-brand-amber flex-shrink-0"></i>
+          <div>
+            <div class="text-xs text-slate-400 font-bold uppercase">Snelheid</div>
+            <div class="text-sm font-extrabold text-white">Live in 48 Uur</div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3 p-3 rounded-lg bg-black/40 border border-white/5">
+          <i data-lucide="fuel" class="w-6 h-6 text-yellow-400 flex-shrink-0"></i>
+          <div>
+            <div class="text-xs text-slate-400 font-bold uppercase">Diesel Besparing</div>
+            <div class="text-sm font-extrabold text-white">0 Loze Rij-Kilo's</div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3 p-3 rounded-lg bg-black/40 border border-white/5">
+          <i data-lucide="receipt" class="w-6 h-6 text-emerald-400 flex-shrink-0"></i>
+          <div>
+            <div class="text-xs text-slate-400 font-bold uppercase">Fiscaal Voordeel</div>
+            <div class="text-sm font-extrabold text-white">100% KvK Aftrekbaar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="scrolly-knights" class="py-24 bg-gradient-to-b from-brand-charcoal via-brand-carbon to-brand-charcoal border-y border-brand-surfaceBorder relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-brand-amber font-mono font-bold tracking-widest text-xs uppercase px-3 py-1 bg-brand-amber/10 rounded-full border border-brand-amber/30">
+          De Eer van het Ambacht
+        </span>
+        <h2 class="mt-4 font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight">
+          Vroeger waren het ridders in harnas. <br><span class="text-brand-amber">Vandaag ben jij het met je bus en gereedschap.</span>
+        </h2>
+        <p class="mt-4 text-slate-400 text-base sm:text-lg">
+          Zonder jou zakt de stad in elkaar. Geen dak waterdicht, geen leiding aangesloten, geen muur strak. Dus waarom accepteer je dat je behandeld wordt als een prijsvechter op Marktplaats?
+        </p>
+      </div>
+
+      <!-- Scrolly Comparison Graphic -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+        <!-- The Old School Mistake -->
+        <div class="metal-plate rounded-2xl p-8 relative overflow-hidden group hover:border-red-500/40 transition-all duration-300">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="flex items-center justify-between pb-6 border-b border-white/10">
+            <span class="px-3 py-1 rounded bg-red-500/20 text-red-400 font-mono text-xs font-bold uppercase tracking-wider">
+              Zoals 85% van de ZZP'ers ploetert
+            </span>
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i>
+          </div>
+
+          <div class="mt-6 space-y-4 text-slate-300 text-sm">
+            <div class="flex items-start gap-3">
+              <span class="text-red-400 font-bold text-lg">✕</span>
+              <p><strong class="text-white">Geen website of een trage Facebook pagina:</strong> Mensen die serieuze uitbouwen van €20.000 gunnen, zoeken jou op Google en vinden… helemaal niets.</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-red-400 font-bold text-lg">✕</span>
+              <p><strong class="text-white">Loze telefoontjes om 20:30 uur:</strong> Gelukszoekers die 45 minuten praten over een kitrandje van €40 op 35 kilometer afstand.</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-red-400 font-bold text-lg">✕</span>
+              <p><strong class="text-white">Avonden lang offertes typen op zolder:</strong> Je komt kapot thuis van de bouw, maar moet nog tot 23:00 uur Word-documenten zitten bakken.</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-red-400 font-bold text-lg">✕</span>
+              <p><strong class="text-white">Afhankelijk van mond-tot-mond:</strong> Als je vaste relatie een maand geen klus heeft, zweet jij over de lease van je bus.</p>
+            </div>
+          </div>
+
+          <div class="mt-8 p-4 rounded-xl bg-red-950/30 border border-red-900/40 text-xs text-red-200">
+            <strong>Gevolg:</strong> Je werkt 65 uur per week, maar houdt te weinig over omdat je vecht tegen beunhazen op uurtarief.
+          </div>
+        </div>
+
+        <!-- The AMS-CampusStudio Standard -->
+        <div class="metal-plate rounded-2xl p-8 relative overflow-hidden border-brand-amber/50 group shadow-glow-amber">
+          <div class="absolute -top-10 -right-10 w-44 h-44 bg-brand-amber/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="flex items-center justify-between pb-6 border-b border-white/10">
+            <span class="px-3 py-1 rounded bg-brand-amber/20 text-brand-amber font-mono text-xs font-bold uppercase tracking-wider">
+              Het AMS-CampusStudio Kampioen Model
+            </span>
+            <i data-lucide="crown" class="w-6 h-6 text-brand-amber"></i>
+          </div>
+
+          <div class="mt-6 space-y-4 text-slate-300 text-sm">
+            <div class="flex items-start gap-3">
+              <span class="text-brand-neon font-bold text-lg">✓</span>
+              <p><strong class="text-white">Onmiddellijk Gezag op Google:</strong> Als een particuliere opdrachtgever jouw KvK of naam Googelt, ziet hij een strakke meester-vakman met reviews en trots.</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-brand-neon font-bold text-lg">✓</span>
+              <p><strong class="text-white">Hard Filter op Werkafstand & Minimum Klus:</strong> Klanten zien direct: "Minimale projectgrootte €1.500 | Max 25km rond Amsterdam/Utrecht". Geen bandenschoppers meer.</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-brand-neon font-bold text-lg">✓</span>
+              <p><strong class="text-white">Directe WhatsApp Offerte Aanvraag:</strong> Klanten klikken en jouw WhatsApp opent met hun adres, foto van de werksituatie en gewenste datum vooraf ingevuld.</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-brand-neon font-bold text-lg">✓</span>
+              <p><strong class="text-white">Geen seconde zolder-administratie:</strong> Terwijl je met je koffiebeker in de bus zit, stuur jij binnen 60 seconden je richtprijs terug.</p>
+            </div>
+          </div>
+
+          <div class="mt-8 p-4 rounded-xl bg-brand-surface border border-brand-amber/40 text-xs text-brand-amber font-bold flex items-center justify-between">
+            <span>Resultaat: Alleen topklussen met gezonde marge in jouw eigen regio.</span>
+            <i data-lucide="trending-up" class="w-5 h-5 text-brand-neon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="van-demo" class="py-24 bg-brand-charcoal relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-brand-neon font-mono font-bold tracking-widest text-xs uppercase px-3 py-1 bg-brand-neon/10 rounded-full border border-brand-neon/30">
+          Live Demonstratie
+        </span>
+        <h2 class="mt-4 font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight">
+          De "Busje Offerte Machine": <br><span class="text-brand-neon">Zo pakt de klant direct jouw WhatsApp</span>
+        </h2>
+        <p class="mt-4 text-slate-400 text-base sm:text-lg">
+          Mensen haten formulieren van 20 velden. Jouw toekomstige website heeft één niet te missen knop. Test de simulator hieronder alsof je de klant bent:
+        </p>
+      </div>
+
+      <!-- Simulator Interactive Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <!-- Controls & Scope Selector -->
+        <div class="lg:col-span-6 space-y-6">
+          <div class="metal-plate p-6 rounded-2xl">
+            <h3 class="font-display font-bold text-xl text-white flex items-center gap-2 mb-4">
+              <i data-lucide="sliders" class="w-5 h-5 text-brand-amber"></i>
+              <span>Stel een testklus samen (Klantperspectief):</span>
+            </h3>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Selecteer Vakgebied:</label>
+                <div class="grid grid-cols-3 gap-2" id="trade-selector">
+                  <button type="button" onclick="setMockTrade('Schilderwerk', 'Binnen schilderwerk trap + deuren', '€2.400')" class="trade-btn active px-3 py-2 text-xs rounded bg-brand-surfaceBorder text-brand-amber font-bold border border-brand-amber flex items-center justify-center gap-1.5">
+                    <i data-lucide="paintbrush" class="w-3.5 h-3.5"></i> Schilder
+                  </button>
+                  <button type="button" onclick="setMockTrade('Badkamer / Loodgieter', 'Volledige badkamer renovatie incl. leidingwerk', '€8.500')" class="trade-btn px-3 py-2 text-xs rounded bg-brand-surface text-slate-300 font-bold border border-white/10 hover:border-brand-amber flex items-center justify-center gap-1.5">
+                    <i data-lucide="wrench" class="w-3.5 h-3.5"></i> Loodgieter
+                  </button>
+                  <button type="button" onclick="setMockTrade('Timmerwerk / Aanbouw', 'Maatwerk cinewall + kozijnen plaatsen', '€4.200')" class="trade-btn px-3 py-2 text-xs rounded bg-brand-surface text-slate-300 font-bold border border-white/10 hover:border-brand-amber flex items-center justify-center gap-1.5">
+                    <i data-lucide="hammer" class="w-3.5 h-3.5"></i> Timmerman
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Adres van de Klant (Vooraf geverifieerd binnen je straal):</label>
+                <input id="mock-address" type="text" value="Keizersgracht 412, Amsterdam (Binnen je 20km zone)" class="w-full bg-brand-carbon border border-white/15 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-neon" oninput="updateMockPreview()">
+              </div>
+
+              <div>
+                <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Gewenste Startdatum:</label>
+                <select id="mock-date" class="w-full bg-brand-carbon border border-white/15 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-neon" onchange="updateMockPreview()">
+                  <option value="Zo snel mogelijk (binnen 2 weken)">Zo snel mogelijk (binnen 2 weken)</option>
+                  <option value="Volgende maand">Volgende maand</option>
+                  <option value="Flexibel / Q3">Flexibel / Q3</option>
+                </select>
+              </div>
+
+              <div class="p-3 bg-brand-surface rounded-lg border border-white/10 text-xs text-slate-400 flex items-center gap-3">
+                <i data-lucide="filter" class="w-5 h-5 text-brand-amber flex-shrink-0"></i>
+                <span><strong>Filter Actief:</strong> Klanten buiten je postcodegebied krijgen vriendelijk een melding dat je vol zit, zodat jij geen diesel weggooit.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone Mockup simulating WhatsApp pre-filled chat -->
+        <div class="lg:col-span-6 flex justify-center">
+          <div class="w-full max-w-[340px] bg-slate-900 border-4 border-slate-700 rounded-[36px] p-3 shadow-2xl shadow-black relative overflow-hidden">
+            <!-- Speaker grill and camera notch -->
+            <div class="h-4 w-28 bg-slate-800 rounded-full mx-auto mb-2 flex items-center justify-center">
+              <div class="w-3 h-3 rounded-full bg-black"></div>
+            </div>
+
+            <!-- Screen Area -->
+            <div class="bg-[#0b141a] rounded-[24px] overflow-hidden flex flex-col h-[520px] text-xs font-sans">
+              <!-- WhatsApp Header -->
+              <div class="bg-brand-waDark p-3 flex items-center gap-3 text-white">
+                <div class="w-8 h-8 rounded-full bg-brand-amber text-black font-black flex items-center justify-center text-sm font-display">
+                  BK
+                </div>
+                <div class="flex-1">
+                  <div class="font-bold text-sm leading-none">Bouwbedrijf De Koning (Jij)</div>
+                  <div class="text-[10px] text-emerald-200">Online | Klaar voor offerte</div>
+                </div>
+                <i data-lucide="phone" class="w-4 h-4 text-emerald-100"></i>
+              </div>
+
+              <!-- Chat Message Bubble Area -->
+              <div class="flex-1 p-3 space-y-3 overflow-y-auto bg-[radial-gradient(#1f2c34_1px,transparent_1px)] [background-size:16px_16px]">
+                <!-- Timestamp tag -->
+                <div class="text-center">
+                  <span class="bg-[#182229] text-[10px] text-slate-400 px-2 py-0.5 rounded shadow">VANDAAG 11:42</span>
+                </div>
+
+                <!-- Customer Incoming Bubble (Pre-filled by website) -->
+                <div class="bg-[#005c4b] text-white p-3 rounded-2xl rounded-tr-none shadow max-w-[90%] ml-auto space-y-1.5 border border-emerald-500/20">
+                  <div class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-200 uppercase">
+                    <i data-lucide="check-check" class="w-3 h-3 text-emerald-300"></i>
+                    <span>Nieuwe Offerte Aanvraag via Website</span>
+                  </div>
+                  <div class="font-bold text-sm text-yellow-300" id="preview-trade-title">Schilderwerk</div>
+                  <p class="text-slate-100 text-[11px]" id="preview-scope">Binnen schilderwerk trap + deuren</p>
+                  
+                  <div class="pt-1 border-t border-emerald-700/50 text-[10px] text-slate-200 space-y-0.5">
+                    <div>📍 <strong>Locatie:</strong> <span id="preview-address">Keizersgracht 412, Amsterdam</span></div>
+                    <div>📅 <strong>Gewenst:</strong> <span id="preview-date">Zo snel mogelijk</span></div>
+                    <div>📸 <strong>Bijlagen:</strong> 2 Foto's werksituatie toegevoegd</div>
+                  </div>
+                  <div class="text-right text-[9px] text-slate-300">11:42 ✓✓</div>
+                </div>
+
+                <!-- Tradesman fast response from the van -->
+                <div class="bg-[#202c33] text-white p-3 rounded-2xl rounded-tl-none shadow max-w-[85%] space-y-1">
+                  <div class="text-[10px] text-slate-400 font-bold">Jij (Vanuit de bus):</div>
+                  <p class="text-[11px] leading-relaxed">
+                    Hoi! Ontvangen. Ik zit net op een klus in Amsterdam Centrum. Op basis van je foto's kan ik dit volgende week donderdag inplannen. Richtprijs ligt rond de <strong class="text-brand-amber font-mono" id="preview-price">€2.400</strong> incl. verf. Schikt 08:00 uur?
+                  </p>
+                  <div class="text-right text-[9px] text-slate-400">11:43 ✓✓</div>
+                </div>
+              </div>
+
+              <!-- Simulated WhatsApp Bottom Input -->
+              <div class="bg-[#202c33] p-2 flex items-center gap-2 border-t border-white/5">
+                <div class="flex-1 bg-[#2a3942] rounded-full px-3 py-1.5 text-slate-300 text-[11px] flex items-center justify-between">
+                  <span>Klant tikt: "Top, deal!"</span>
+                  <i data-lucide="smile" class="w-3.5 h-3.5 text-slate-400"></i>
+                </div>
+                <div class="w-7 h-7 rounded-full bg-brand-neon flex items-center justify-center text-slate-950 font-bold">
+                  <i data-lucide="send" class="w-3.5 h-3.5 fill-current"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="math-calculator" class="py-24 bg-brand-carbon border-y border-brand-surfaceBorder relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-brand-amber font-mono font-bold tracking-widest text-xs uppercase px-3 py-1 bg-brand-amber/10 rounded-full border border-brand-amber/30">
+          Rekensom Zonder Flauwekul
+        </span>
+        <h2 class="mt-4 font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight">
+          "Wat kost het me om <span class="text-brand-amber">NIET</span> vindbaar te zijn?"
+        </h2>
+        <p class="mt-4 text-slate-400 text-base sm:text-lg">
+          Schuif met de balken. Zie direct hoeveel netto marge jij per jaar laat liggen bij de concurrenten in jouw regio.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <!-- Sliders Input Column -->
+        <div class="lg:col-span-7 metal-plate p-6 sm:p-8 rounded-2xl flex flex-col justify-between space-y-6">
+          <!-- Slider 1 -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-sm font-bold text-white uppercase">1. Jouw gemiddelde winst per klus:</label>
+              <span class="text-brand-amber font-mono font-black text-lg" id="val-profit">€ 1.800</span>
+            </div>
+            <input type="range" id="slider-profit" min="500" max="8000" step="100" value="1800" class="w-full" oninput="calculateLoss()">
+            <div class="flex justify-between text-[11px] text-slate-500 font-mono mt-1">
+              <span>€500 (Klein schilderwerk)</span>
+              <span>€8.000+ (Grote aanbouw / dakkapel)</span>
+            </div>
+          </div>
+
+          <!-- Slider 2 -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-sm font-bold text-white uppercase">2. Klussen die nu naar de concurrent gaan (per maand):</label>
+              <span class="text-brand-amber font-mono font-black text-lg" id="val-lost">2 klussen</span>
+            </div>
+            <input type="range" id="slider-lost" min="1" max="10" step="1" value="2" class="w-full" oninput="calculateLoss()">
+            <div class="flex justify-between text-[11px] text-slate-500 font-mono mt-1">
+              <span>1 klus/maand</span>
+              <span>10 klussen/maand</span>
+            </div>
+          </div>
+
+          <!-- Slider 3 -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-sm font-bold text-white uppercase">3. Verloren uren aan nutteloze telefoontjes & beun-offertes (per week):</label>
+              <span class="text-brand-amber font-mono font-black text-lg" id="val-hours">4 uur/week</span>
+            </div>
+            <input type="range" id="slider-hours" min="1" max="15" step="1" value="4" class="w-full" oninput="calculateLoss()">
+            <div class="flex justify-between text-[11px] text-slate-500 font-mono mt-1">
+              <span>1 uur (Minimaal)</span>
+              <span>15 uur (Complete zaterdagen weggegooid)</span>
+            </div>
+          </div>
+
+          <!-- Diesel / Driving assumption note -->
+          <div class="pt-4 border-t border-white/10 flex items-center gap-3 text-xs text-slate-400">
+            <i data-lucide="info" class="w-4 h-4 text-brand-amber flex-shrink-0"></i>
+            <span>Gebaseerd op een gemiddeld ZZP uurtarief van €55/uur en actuele dieselprijzen in Nederland.</span>
+          </div>
+        </div>
+
+        <!-- Real-Time Calculation Result Column -->
+        <div class="lg:col-span-5 bg-gradient-to-b from-[#1b222c] to-[#0f1318] p-6 sm:p-8 rounded-2xl border-2 border-brand-amber flex flex-col justify-between relative shadow-glow-amber">
+          <div class="space-y-4">
+            <span class="inline-block px-3 py-1 rounded bg-brand-amber/20 text-brand-amber font-mono font-bold text-xs uppercase">
+              Jouw Jaarlijkse Verliesanalyse
+            </span>
+
+            <div>
+              <div class="text-xs font-mono uppercase text-slate-400">Misgelopen winst op tafel laten liggen:</div>
+              <div class="text-4xl sm:text-5xl font-display font-black text-red-400 tracking-tight mt-1" id="stat-money-lost">
+                € 43.200
+              </div>
+              <div class="text-xs text-slate-400 mt-1">Elk jaar cadeau gedaan aan aannemers die wél online staan.</div>
+            </div>
+
+            <div class="pt-4 border-t border-white/10">
+              <div class="text-xs font-mono uppercase text-slate-400">Weggegooide tijd aan offertes voor beunhazen:</div>
+              <div class="text-2xl font-display font-black text-yellow-400 mt-1" id="stat-wasted-time">
+                192 uur / € 10.560
+              </div>
+              <div class="text-xs text-slate-400 mt-1">Uren die je had kunnen doorbrengen met je gezin of declarabele klussen.</div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-white/10 space-y-4">
+            <div class="p-3.5 bg-brand-surface rounded-xl border border-brand-neon/40 flex items-center justify-between">
+              <div>
+                <div class="text-[11px] font-mono uppercase text-slate-400">AMS-CampusStudio Eenmalige Investering:</div>
+                <div class="text-xl font-display font-black text-brand-neon">€ 75 eenmalig</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] font-mono text-emerald-400 font-bold">1e Jaar ROI:</div>
+                <div class="text-base font-black text-white" id="stat-roi">71,600%</div>
+              </div>
+            </div>
+
+            <a href="#order-terminal" class="w-full py-3.5 rounded-xl bg-brand-neon hover:bg-emerald-400 text-slate-950 font-black text-sm uppercase tracking-wide flex items-center justify-center gap-2 transition shadow-glow-green">
+              <span>Stop Dit Lek Vandaag</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="quiz-section" class="py-24 bg-brand-charcoal relative">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <span class="text-yellow-400 font-mono font-bold tracking-widest text-xs uppercase px-3 py-1 bg-yellow-400/10 rounded-full border border-yellow-400/30">
+          Zelf-Audit
+        </span>
+        <h2 class="mt-4 font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight">
+          De Eerlijke ZZP Reality-Check
+        </h2>
+        <p class="mt-2 text-slate-400 text-base">
+          Beantwoord 3 directe vragen over hoe particulieren en hoofdaannemers nu naar jou kijken.
+        </p>
+      </div>
+
+      <!-- Quiz Card Container -->
+      <div class="metal-plate p-6 sm:p-10 rounded-2xl relative" id="quiz-container">
+        <!-- Progress Steps -->
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
+          <div class="flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-full bg-brand-amber text-black font-black text-xs flex items-center justify-center font-mono" id="quiz-step-indicator">1</span>
+            <span class="text-xs uppercase font-mono tracking-wider text-slate-300 font-bold" id="quiz-step-title">Vraag 1 van 3</span>
+          </div>
+          <div class="text-xs text-brand-neon font-mono font-bold">100% Anoniem & Direct Inzicht</div>
+        </div>
+
+        <!-- Question 1 -->
+        <div id="q1" class="quiz-step space-y-6">
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white">
+            Waar zoekt een huiseigenaar als hij een verbouwing van €15.000+ overweegt?
+          </h3>
+          <div class="space-y-3">
+            <button onclick="answerQuiz(1, 'A')" class="w-full text-left p-4 rounded-xl bg-brand-surface border border-white/10 hover:border-brand-amber transition flex items-center justify-between group">
+              <span class="text-sm font-semibold text-slate-200 group-hover:text-white">A. Hij vraagt alleen zijn buurman om een vage naam.</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-brand-amber transition"></i>
+            </button>
+            <button onclick="answerQuiz(1, 'B')" class="w-full text-left p-4 rounded-xl bg-brand-surface border border-white/10 hover:border-brand-amber transition flex items-center justify-between group">
+              <span class="text-sm font-semibold text-slate-200 group-hover:text-white">B. Hij typt je naam of "beste timmerman / schilder in [stad]" in Google om te checken of je te vertrouwen bent.</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-brand-amber transition"></i>
+            </button>
+            <button onclick="answerQuiz(1, 'C')" class="w-full text-left p-4 rounded-xl bg-brand-surface border border-white/10 hover:border-brand-amber transition flex items-center justify-between group">
+              <span class="text-sm font-semibold text-slate-200 group-hover:text-white">C. Hij kijkt alleen naar wie de goedkoopste uurtarief-beunhaas is.</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-brand-amber transition"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div id="q2" class="quiz-step hidden space-y-6">
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white">
+            Wat gebeurt er als een serieuze klant jouw bedrijfsnaam intypt en er verschijnt NIETS?
+          </h3>
+          <div class="space-y-3">
+            <button onclick="answerQuiz(2, 'A')" class="w-full text-left p-4 rounded-xl bg-brand-surface border border-white/10 hover:border-brand-amber transition flex items-center justify-between group">
+              <span class="text-sm font-semibold text-slate-200 group-hover:text-white">A. Hij denkt dat ik een zwartwerker of onbetrouwbaar ben, en belt de volgende op de lijst.</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-brand-amber transition"></i>
+            </button>
+            <button onclick="answerQuiz(2, 'B')" class="w-full text-left p-4 rounded-xl bg-brand-surface border border-white/10 hover:border-brand-amber transition flex items-center justify-between group">
+              <span class="text-sm font-semibold text-slate-200 group-hover:text-white">B. Hij belt me toch wel, want mond-tot-mond is heilig.</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-brand-amber transition"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div id="q3" class="quiz-step hidden space-y-6">
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white">
+            Hoeveel kost het je aan brandstof en tijd als je wekelijks 2 offertes rijdt die afhaken?
+          </h3>
+          <div class="space-y-3">
+            <button onclick="answerQuiz(3, 'A')" class="w-full text-left p-4 rounded-xl bg-brand-surface border border-white/10 hover:border-brand-amber transition flex items-center justify-between group">
+              <span class="text-sm font-semibold text-slate-200 group-hover:text-white">A. Zeker €400 tot €600 per maand aan verloren declarabele uren + diesel.</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-brand-amber transition"></i>
+            </button>
+            <button onclick="answerQuiz(3, 'B')" class="w-full text-left p-4 rounded-xl bg-brand-surface border border-white/10 hover:border-brand-amber transition flex items-center justify-between group">
+              <span class="text-sm font-semibold text-slate-200 group-hover:text-white">B. Maakt me niet uit, ik vind autorijden gezellig.</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-brand-amber transition"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quiz Final Result Diagnostic -->
+        <div id="quiz-result" class="hidden space-y-6">
+          <div class="p-6 rounded-xl bg-brand-surface border border-brand-amber/50 space-y-3">
+            <div class="flex items-center gap-3 text-brand-amber font-display font-black text-2xl">
+              <i data-lucide="alert-octagon" class="w-7 h-7"></i>
+              <span>Diagnose: Je bent een Meester in je Vak, maar Onzichtbaar voor Topbudgetten.</span>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Uit marktdata blijkt dat <strong>89% van de particulieren met budgetten boven €5.000</strong> eerst de vakman opzoekt via Google op zijn mobiel. Zien ze geen professionele presentatie met jouw afgeronde projecten en duidelijke garantie? Dan kiezen ze voor de vakman die zijn online zaken wél strak heeft geregeld.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center gap-4">
+            <a href="#order-terminal" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-brand-amber hover:bg-brand-flame text-black font-black text-sm uppercase flex items-center justify-center gap-2 shadow-glow-amber">
+              <span>Laat AMS-CampusStudio Dit Oplossen in 48 Uur</span>
+              <i data-lucide="check" class="w-4 h-4"></i>
+            </a>
+            <button onclick="resetQuiz()" class="text-xs text-slate-400 hover:text-white underline">
+              Test Opnieuw Doen
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 bg-brand-carbon border-y border-brand-surfaceBorder relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Text side -->
+        <div class="lg:col-span-6 space-y-6">
+          <span class="text-brand-amber font-mono font-bold tracking-widest text-xs uppercase px-3 py-1 bg-brand-amber/10 rounded-full border border-brand-amber/30">
+            De KvK Pre-Screening
+          </span>
+          <h2 class="font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight">
+            Wat ziet de aannemer als hij jou Googelt voor een <span class="text-brand-amber">€25.000 offerte?</span>
+          </h2>
+          <p class="text-slate-300 text-base leading-relaxed">
+            Als een hoofdaannemer of vermogende woningeigenaar op het punt staat een aanbetaling van €8.000 naar je bankrekening over te maken, tikt hij jouw naam in Google. 
+          </p>
+          <div class="space-y-3 text-sm text-slate-300">
+            <div class="p-3 rounded-lg bg-black/40 border border-white/10 flex items-center gap-3">
+              <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i>
+              <span><strong>Met AMS-CampusStudio:</strong> Direct een strakke Google Bedrijfsprofiel banner, 5-sterren reviews, heldere KvK verificatie en jouw beste foto's.</span>
+            </div>
+            <div class="p-3 rounded-lg bg-black/40 border border-white/10 flex items-center gap-3">
+              <i data-lucide="x-circle" class="w-5 h-5 text-red-400 flex-shrink-0"></i>
+              <span><strong>Zonder website:</strong> Alleen een droge vermelding op OpenKvK of een verouderd Telefoongids profiel. De klant twijfelt en kiest een ander.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Google Result Interactive Mockup -->
+        <div class="lg:col-span-6">
+          <div class="bg-black/80 rounded-2xl p-5 border border-white/15 shadow-2xl font-sans">
+            <!-- Simulated Google Browser Bar -->
+            <div class="flex items-center gap-2 pb-4 mb-4 border-b border-white/10 text-xs text-slate-400">
+              <div class="flex gap-1.5">
+                <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+                <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+              </div>
+              <div class="flex-1 bg-brand-surface rounded-full px-4 py-1 text-slate-300 font-mono text-[11px] truncate">
+                https://www.google.nl/search?q=Vakman+Jansen+Timmerman+KvK
+              </div>
+            </div>
+
+            <!-- Google Snippet -->
+            <div class="space-y-3">
+              <div class="text-xs text-slate-400 flex items-center gap-2">
+                <div class="w-4 h-4 rounded-full bg-brand-amber flex items-center justify-center text-[10px] text-black font-bold">✓</div>
+                <span>https://www.vakmanjansen-bouw.nl</span>
+              </div>
+              <a href="#order-terminal" class="block text-blue-400 hover:underline text-lg font-bold">
+                Vakman Jansen | Specialist Aanbouw & Kozijnen Amsterdam
+              </a>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Officiële website van Bouwbedrijf Jansen (KvK 84930122). Specialist in hoogwaardig timmerwerk, aanbouw en kozijnen in regio Groot-Amsterdam. Vrijblijvende richtprijs via WhatsApp binnen 30 minuten...
+              </p>
+              
+              <!-- Google Rich Snippet Rating Stars -->
+              <div class="flex items-center gap-2 text-xs pt-1">
+                <div class="flex text-amber-400">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                </div>
+                <span class="text-white font-bold">5.0</span>
+                <span class="text-slate-400">(48 geverifieerde reviews) · Vaste prijzen · Geen voorrijkosten</span>
+              </div>
+
+              <!-- Sitelinks -->
+              <div class="grid grid-cols-2 gap-2 pt-2">
+                <div class="p-2 rounded bg-brand-surface/60 border border-white/5 text-[11px]">
+                  <span class="text-blue-400 font-semibold block">Recente Projecten</span>
+                  <span class="text-slate-400">Bekijk 24 gerealiseerde klussen</span>
+                </div>
+                <div class="p-2 rounded bg-brand-surface/60 border border-white/5 text-[11px]">
+                  <span class="text-blue-400 font-semibold block">Direct WhatsApp Contact</span>
+                  <span class="text-slate-400">Stuur foto's vanuit je telefoon</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="py-24 bg-brand-charcoal relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-brand-amber font-mono font-bold tracking-widest text-xs uppercase px-3 py-1 bg-brand-amber/10 rounded-full border border-brand-amber/30">
+          Geen Verborgen Kosten. Geen Slappe Praatjes.
+        </span>
+        <h2 class="mt-4 font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight">
+          Eén Heldere Prijs. <br><span class="text-brand-neon">100% Jouw Eigendom.</span>
+        </h2>
+        <p class="mt-4 text-slate-400 text-base sm:text-lg">
+          Webbureau's rekenen €2.500 vooraf en naaien je met een verplicht contract van €79/maand. Bij AMS-CampusStudio snappen we hoe ZZP'ers werken:
+        </p>
+      </div>
+
+      <!-- Pricing Comparison Grid -->
+      <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+        <!-- Traditional Agency Trap -->
+        <div class="metal-plate p-8 rounded-2xl border-white/10 opacity-80 flex flex-col justify-between">
+          <div>
+            <div class="text-xs font-mono uppercase text-red-400 font-bold mb-2">Het Typische Reclamebureau</div>
+            <div class="text-3xl font-display font-black text-white">€ 2.450 <span class="text-xs text-slate-400 font-normal">+ €69/mnd</span></div>
+            <p class="text-xs text-slate-400 mt-2">Dure koffie drinken en 8 weken wachten op een concept.</p>
+
+            <ul class="mt-6 space-y-3 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><span class="text-red-400">✕</span> 2 maanden levertijd met 6 eindeloze meetings</li>
+              <li class="flex items-center gap-2"><span class="text-red-400">✕</span> Je zit vast aan een wurgcontract</li>
+              <li class="flex items-center gap-2"><span class="text-red-400">✕</span> Domeinnaam blijft gijzelaar van het bureau</li>
+              <li class="flex items-center gap-2"><span class="text-red-400">✕</span> Formulieren die niemand op mobiel invult</li>
+            </ul>
+          </div>
+          <div class="mt-8 pt-4 border-t border-white/10 text-xs text-slate-400 italic">
+            "We moeten eerst een brand identity workshop van 4 uur doen..."
+          </div>
+        </div>
+
+        <!-- The AMS-CampusStudio Deal -->
+        <div class="bg-brand-surface p-8 rounded-2xl border-2 border-brand-amber relative shadow-glow-amber flex flex-col justify-between">
+          <div class="absolute -top-3 right-6 bg-brand-amber text-black font-display font-black text-xs uppercase px-3 py-1 rounded-full shadow">
+            Populair bij ZZP Bouw
+          </div>
+
+          <div>
+            <div class="text-xs font-mono uppercase text-brand-neon font-bold mb-2">AMS-CampusStudio Vakman Pakket</div>
+            <div class="text-4xl font-display font-black text-white">€ 75 <span class="text-xs text-brand-amber font-mono font-bold">Eenmalig</span></div>
+            <p class="text-xs text-slate-300 mt-1">Hosting direct op een betrouwbare €4/mnd host. Jij bezit 100% van de code en domein.</p>
+
+            <ul class="mt-6 space-y-3 text-xs text-slate-200">
+              <li class="flex items-center gap-2"><span class="text-brand-neon font-bold">✓</span> <strong>Live binnen 48 uur</strong> (Geen teksten schrijven)</li>
+              <li class="flex items-center gap-2"><span class="text-brand-neon font-bold">✓</span> <strong>Directe WhatsApp Koppeling</strong> met adres-preset</li>
+              <li class="flex items-center gap-2"><span class="text-brand-neon font-bold">✓</span> <strong>Filter voor minimale klusgrootte & straal</strong></li>
+              <li class="flex items-center gap-2"><span class="text-brand-neon font-bold">✓</span> <strong>Google Bedrijfsprofiel & SEO</strong> gereed</li>
+              <li class="flex items-center gap-2"><span class="text-brand-neon font-bold">✓</span> <strong>100% Fiscaal Aftrekbaar</strong> als bedrijfskosten</li>
+              <li class="flex items-center gap-2"><span class="text-brand-neon font-bold">✓</span> <strong>NUL maandelijkse bureaukosten</strong> aan ons</li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-white/10">
+            <a href="#order-terminal" class="w-full py-4 rounded-xl bg-brand-amber hover:bg-brand-flame text-black font-black text-base uppercase tracking-wide flex items-center justify-center gap-2 transition duration-200 shadow-glow-amber">
+              <i data-lucide="zap" class="w-5 h-5 fill-black"></i>
+              <span>Claim Dit Tarief Voor Deze Week</span>
+            </a>
+            <div class="text-center text-[11px] text-slate-400 mt-2 font-mono">
+              Inclusief factuur met BTW voor je boekhouder
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="order-terminal" class="py-24 bg-gradient-to-b from-brand-charcoal via-brand-carbon to-black border-t border-brand-surfaceBorder relative">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <span class="text-brand-neon font-mono font-bold tracking-widest text-xs uppercase px-3 py-1 bg-brand-neon/10 rounded-full border border-brand-neon/30">
+          Geen Moeite · In 2 Minuten Klaar
+        </span>
+        <h2 class="mt-4 font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight">
+          Start Jouw Conversie Machine
+        </h2>
+        <p class="mt-3 text-slate-400 text-base">
+          Je hoeft geen letter tekst te schrijven. Vul je KvK nummer in, geef je specialisme aan en stuur foto's. Wij doen de rest in 48 uur.
+        </p>
+      </div>
+
+      <!-- Gamified 3-Step Terminal Box -->
+      <div class="metal-plate p-6 sm:p-10 rounded-3xl border-2 border-brand-surfaceBorder shadow-2xl relative">
+        <!-- Step progress circles -->
+        <div class="grid grid-cols-3 gap-2 mb-8 text-center text-xs font-bold uppercase font-mono">
+          <div id="step-tab-1" class="py-2 rounded-lg bg-brand-amber text-black transition">1. KvK & Bedrijf</div>
+          <div id="step-tab-2" class="py-2 rounded-lg bg-brand-surface text-slate-400 transition">2. Werkgebied & Foto's</div>
+          <div id="step-tab-3" class="py-2 rounded-lg bg-brand-surface text-slate-400 transition">3. WhatsApp Bevestiging</div>
+        </div>
+
+        <form id="express-order-form" onsubmit="handleOrderSubmit(event)">
+          <!-- STEP 1: KvK & Contact -->
+          <div id="form-step-1" class="space-y-5">
+            <div>
+              <label class="block text-xs font-mono uppercase text-slate-300 font-bold mb-1">Jouw KvK Nummer (Simuleer opzoeking):</label>
+              <div class="relative">
+                <input type="text" id="order-kvk" required placeholder="Bijv. 84930122" class="w-full bg-brand-carbon border border-white/15 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-brand-amber font-mono" oninput="simulateKvkLookup(this.value)">
+                <div id="kvk-spinner" class="hidden absolute right-3 top-3.5">
+                  <i data-lucide="loader" class="w-5 h-5 text-brand-amber animate-spin"></i>
+                </div>
+              </div>
+              <div id="kvk-autofill-notice" class="hidden mt-2 p-2.5 rounded bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-300 flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
+                <span id="kvk-company-name">Gevonden: Handelsregister gecontroleerd</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-mono uppercase text-slate-300 font-bold mb-1">Jouw Naam / Eigenaar:</label>
+                <input type="text" id="order-name" required placeholder="Bijv. Dennis de Koning" class="w-full bg-brand-carbon border border-white/15 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-brand-amber">
+              </div>
+              <div>
+                <label class="block text-xs font-mono uppercase text-slate-300 font-bold mb-1">Jouw 06-Nummer (Voor WhatsApp routering):</label>
+                <input type="tel" id="order-phone" required placeholder="06 - 12 34 56 78" class="w-full bg-brand-carbon border border-white/15 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-brand-amber font-mono">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-mono uppercase text-slate-300 font-bold mb-1">Hoofdactiviteit / Vak:</label>
+              <select id="order-category" class="w-full bg-brand-carbon border border-white/15 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-brand-amber">
+                <option value="Aannemer / Verbouw">Allround Aannemer / Verbouwingen</option>
+                <option value="Schilder- & Stukadoorsbedrijf">Schilder- & Stukadoorsbedrijf</option>
+                <option value="Timmerbedrijf & Maatwerk">Timmerbedrijf & Maatwerk / Kozijnen</option>
+                <option value="Installatietechniek & Loodgieter">Installatietechniek & Loodgieter</option>
+                <option value="Dakdekker / Isolatie">Dakdekker / Isolatie specialist</option>
+              </select>
+            </div>
+
+            <button type="button" onclick="goToStep(2)" class="w-full py-4 rounded-xl bg-brand-amber hover:bg-brand-flame text-black font-black text-base uppercase tracking-wide flex items-center justify-center gap-2 transition duration-200 shadow-glow-amber">
+              <span>Volgende Stap: Werkgebied & Foto's</span>
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <!-- STEP 2: Range & Dropzone -->
+          <div id="form-step-2" class="hidden space-y-5">
+            <div>
+              <label class="block text-xs font-mono uppercase text-slate-300 font-bold mb-1">Jouw Regio & Max Werk-Straal:</label>
+              <input type="text" id="order-region" placeholder="Bijv. Regio Amsterdam + 25 km max" value="Regio Amsterdam (+ max 25km)" class="w-full bg-brand-carbon border border-white/15 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-brand-amber">
+              <span class="text-[11px] text-slate-400 mt-1 block">Alles hierbuiten wordt gefilterd zodat je niet voor niks in de file staat.</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-mono uppercase text-slate-300 font-bold mb-1">Minimale klusgrootte die je wilt aannemen:</label>
+              <select id="order-minsize" class="w-full bg-brand-carbon border border-white/15 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-brand-amber">
+                <option value="Vanaf € 750">Vanaf € 750 (Geen klusjes onder een halve dag)</option>
+                <option value="Vanaf € 1.500" selected>Vanaf € 1.500 (Gezonde klussen)</option>
+                <option value="Vanaf € 5.000">Vanaf € 5.000 (Grote projecten / verbouwingen)</option>
+              </select>
+            </div>
+
+            <!-- Simulated Photo Dropzone -->
+            <div>
+              <label class="block text-xs font-mono uppercase text-slate-300 font-bold mb-1">5 Telefoonfoto's van je mooiste werk:</label>
+              <div onclick="simulatePhotoDrop()" class="border-2 border-dashed border-white/20 hover:border-brand-neon rounded-2xl p-6 text-center cursor-pointer bg-brand-carbon/60 hover:bg-brand-carbon transition duration-200 group">
+                <div class="w-12 h-12 rounded-full bg-brand-surface mx-auto flex items-center justify-center text-slate-400 group-hover:text-brand-neon transition mb-3">
+                  <i data-lucide="camera" class="w-6 h-6"></i>
+                </div>
+                <div class="text-sm font-bold text-white group-hover:text-brand-neon">Klik hier om foto's vanaf je telefoon te uploaden</div>
+                <div class="text-xs text-slate-400 mt-1">Geen studiokwaliteit nodig. Gewoon eerlijk werk op de bouwplaats.</div>
+                
+                <div id="photo-preview-bar" class="hidden mt-4 pt-4 border-t border-white/10 flex items-center justify-center gap-2">
+                  <span class="px-2 py-1 bg-emerald-900/60 text-emerald-300 rounded text-xs font-mono">✓ 5 foto's klaargezet</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <button type="button" onclick="goToStep(1)" class="w-1/3 py-4 rounded-xl bg-brand-surface hover:bg-brand-surfaceBorder text-slate-300 font-bold text-sm uppercase">
+                Terug
+              </button>
+              <button type="button" onclick="goToStep(3)" class="w-2/3 py-4 rounded-xl bg-brand-amber hover:bg-brand-flame text-black font-black text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow-glow-amber">
+                <span>Controleer & Start (48 Uur)</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 3: Dispatch & Confirmation -->
+          <div id="form-step-3" class="hidden space-y-6">
+            <div class="p-4 rounded-xl bg-brand-surface border border-brand-neon/40 space-y-3">
+              <div class="flex items-center gap-2 text-brand-neon font-display font-black text-lg">
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                <span>Klaar voor lancering binnen 48 uur!</span>
+              </div>
+              <div class="text-xs text-slate-300 space-y-1 font-mono">
+                <div>• <strong>Bedrijf:</strong> <span id="summary-company">Wordt ingeladen...</span></div>
+                <div>• <strong>Contactpersoon:</strong> <span id="summary-name">-</span></div>
+                <div>• <strong>WhatsApp Doelschakeling:</strong> <span id="summary-phone">-</span></div>
+                <div>• <strong>Investering:</strong> €75 eenmalig (KvK aftrekbaar)</div>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Zodra je op de knop hieronder drukt, start de audio-visuele engine, openen we direct je WhatsApp met jouw projectspecificatie en zetten we jouw website binnen 48 uur live.
+            </p>
+
+            <div class="flex gap-3">
+              <button type="button" onclick="goToStep(2)" class="w-1/3 py-4 rounded-xl bg-brand-surface hover:bg-brand-surfaceBorder text-slate-300 font-bold text-sm uppercase">
+                Aanpassen
+              </button>
+              <button type="submit" class="w-2/3 py-4 rounded-xl bg-brand-neon hover:bg-emerald-400 text-slate-950 font-black text-base uppercase tracking-wide flex items-center justify-center gap-2 shadow-glow-green transform hover:scale-[1.02] transition">
+                <i data-lucide="send" class="w-5 h-5 fill-current"></i>
+                <span>Activeer Mijn Systeem Nu</span>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Success Modal / Overlay when submitted -->
+        <div id="order-success-modal" class="hidden absolute inset-0 bg-brand-charcoal/95 backdrop-blur-md rounded-3xl p-8 flex flex-col items-center justify-center text-center z-30">
+          <div class="w-16 h-16 rounded-full bg-brand-neon/20 border-2 border-brand-neon flex items-center justify-center text-brand-neon mb-4">
+            <i data-lucide="check" class="w-8 h-8"></i>
+          </div>
+          <h3 class="font-display font-black text-2xl sm:text-3xl text-white uppercase">Gefeliciteerd, Vakman!</h3>
+          <p class="text-slate-300 text-sm max-w-md mt-2">
+            Jouw aanvraag is veilig geregistreerd. We openen nu jouw WhatsApp chat zodat je binnen 48 uur live bent met je nieuwe Busje Offerte Machine.
+          </p>
+          <div class="mt-6 flex flex-col sm:flex-row gap-3">
+            <button onclick="closeSuccessModal()" class="px-6 py-2.5 rounded-xl bg-brand-surface border border-white/20 text-white font-bold text-xs uppercase">
+              Sluiten
+            </button>
+            <a id="dispatch-wa-link" href="https://wa.me/31600000000?text=Hoi%20AMS-CampusStudio,%20ik%20heb%20mijn%20bedrijf%20aangemeld%20voor%20de%20%E2%82%AC75%20website%20deal." target="_blank" class="px-6 py-2.5 rounded-xl bg-brand-neon text-black font-extrabold text-xs uppercase flex items-center gap-2">
+              <i data-lucide="message-circle" class="w-4 h-4 fill-current"></i>
+              <span>Open WhatsApp Chat</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 bg-brand-carbon border-t border-brand-surfaceBorder">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="font-display font-black text-2xl sm:text-4xl text-white uppercase tracking-tight">
+          Vragen van Vakmannen Die Skeptisch Zijn
+        </h2>
+        <p class="text-slate-400 text-sm mt-2">Geen gladde verkoopteksten. Direct antwoord.</p>
+      </div>
+
+      <div class="space-y-4">
+        <details class="group bg-brand-surface rounded-xl border border-white/10 p-5 cursor-pointer">
+          <summary class="font-bold text-white text-base flex items-center justify-between list-none">
+            <span>Waarom kost het maar €75? Waar zit het addertje onder het gras?</span>
+            <span class="text-brand-amber transition group-open:rotate-180">▼</span>
+          </summary>
+          <p class="mt-3 text-slate-300 text-sm leading-relaxed">
+            Er is geen addertje. We bouwen niet via eindeloze designbureaus met accountmanagers. We gebruiken een strak geprogrammeerd, geoptimaliseerd conversieraamwerk speciaal voor de bouw en techniek. Jij betaalt jouw eigen betrouwbare hosting (€4 per maand direct aan de host), en jij bent 100% eigenaar van alle bestanden. Geen abonnement bij ons.
+          </p>
+        </details>
+
+        <details class="group bg-brand-surface rounded-xl border border-white/10 p-5 cursor-pointer">
+          <summary class="font-bold text-white text-base flex items-center justify-between list-none">
+            <span>Ik ben slecht met computers en heb geen tijd voor teksten.</span>
+            <span class="text-brand-amber transition group-open:rotate-180">▼</span>
+          </summary>
+          <p class="mt-3 text-slate-300 text-sm leading-relaxed">
+            Precies daarom werkt dit. Je hoeft niks te typen. Geef ons je KvK-nummer en app ons 5 foto's van werk waar je trots op bent vanaf de bouwplaats. Wij schrijven de teksten in begrijpelijke, overtuigende vakmanstaal en leveren alles kant-en-klaar op.
+          </p>
+        </details>
+
+        <details class="group bg-brand-surface rounded-xl border border-white/10 p-5 cursor-pointer">
+          <summary class="font-bold text-white text-base flex items-center justify-between list-none">
+            <span>Wat als ik al genoeg werk heb via mond-tot-mond?</span>
+            <span class="text-brand-amber transition group-open:rotate-180">▼</span>
+          </summary>
+          <p class="mt-3 text-slate-300 text-sm leading-relaxed">
+            Het doel van deze machine is niet meer werken, maar <strong>beter betaald werk aannemen</strong>. Zodra je een filter aanzet, stoot je de zeurkousen af en selecteer je alleen nog de dikste klussen in je eigen straat. Zo verdien je hetzelfde of meer met minder uren en nul frustratie.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-black py-12 border-t border-brand-surfaceBorder text-slate-500 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded bg-brand-amber flex items-center justify-center font-display font-black text-black">A</div>
+        <span class="font-bold text-white text-sm">AMS-CampusStudio</span>
+        <span>— De Motor Achter Zelfstandige Vakmensen</span>
+      </div>
+      <div>
+        100% Zakelijke kosten KvK aftrekbaar · KvK Amsterdam · Geen agency lock-in.
+      </div>
+      <div class="flex space-x-4">
+        <a href="#order-terminal" class="hover:text-brand-amber transition">Direct Starten</a>
+        <a href="#math-calculator" class="hover:text-brand-amber transition">Berekening</a>
+        <a href="#van-demo" class="hover:text-brand-amber transition">WhatsApp Machine</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Mobile Sticky Bar for Tradesmen on phone -->
+  <div class="fixed bottom-0 inset-x-0 bg-brand-charcoal/95 backdrop-blur-md border-t border-brand-surfaceBorder p-3 z-40 sm:hidden flex items-center justify-between gap-3 shadow-2xl">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+      <div>
+        <div class="text-xs font-bold text-white">€75 Vakman Deal</div>
+        <div class="text-[10px] text-brand-neon font-mono">Binnen 48u live</div>
+      </div>
+    </div>
+    <a href="#order-terminal" class="px-5 py-2.5 rounded-lg bg-brand-neon text-black font-black text-xs uppercase flex items-center gap-2 shadow-glow-green">
+      <i data-lucide="message-circle" class="w-4 h-4 fill-black"></i>
+      <span>Claim Direct</span>
+    </a>
+  </div>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Sound toggle logic
+    function toggleAudio() {
+      SoundFx.init();
+      SoundFx.enabled = !SoundFx.enabled;
+      const label = document.getElementById('sfx-label');
+      const icon = document.getElementById('sfx-icon');
+      if (SoundFx.enabled) {
+        label.innerText = 'Audio FX: AAN';
+        label.classList.add('text-brand-neon');
+        icon.setAttribute('data-lucide', 'volume-2');
+        SoundFx.playClink();
+      } else {
+        label.innerText = 'Audio FX: OFF';
+        label.classList.remove('text-brand-neon');
+        icon.setAttribute('data-lucide', 'volume-x');
+      }
+      lucide.createIcons();
+    }
+
+    // Canvas Sparks / Ember Particle Simulation
+    const canvas = document.getElementById('ember-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animationFrame;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class EmberParticle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 50;
+        this.size = Math.random() * 2.8 + 0.8;
+        this.speedY = -(Math.random() * 2.2 + 0.8);
+        this.speedX = (Math.random() - 0.5) * 1.5;
+        this.opacity = Math.random() * 0.8 + 0.2;
+        this.hue = Math.random() > 0.3 ? 28 : 12; // Orange or Flame
+      }
+      update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.opacity -= 0.0035;
+        if (this.opacity <= 0 || this.y < 0) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.fillStyle = `hsla(${this.hue}, 100%, 55%, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 45; i++) {
+      particles.push(new EmberParticle());
+    }
+
+    function animateEmbers() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      animationFrame = requestAnimationFrame(animateEmbers);
+    }
+    animateEmbers();
+
+    // 1. Van Quote Machine Mockup Logic
+    let currentTrade = 'Schilderwerk';
+    let currentScope = 'Binnen schilderwerk trap + deuren';
+    let currentPrice = '€2.400';
+
+    function setMockTrade(trade, scope, price) {
+      currentTrade = trade;
+      currentScope = scope;
+      currentPrice = price;
+
+      document.querySelectorAll('#trade-selector .trade-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-surfaceBorder', 'text-brand-amber', 'border-brand-amber');
+        btn.classList.add('bg-brand-surface', 'text-slate-300', 'border-white/10');
+      });
+
+      const activeBtn = event.currentTarget;
+      activeBtn.classList.add('bg-brand-surfaceBorder', 'text-brand-amber', 'border-brand-amber');
+      activeBtn.classList.remove('bg-brand-surface', 'text-slate-300', 'border-white/10');
+
+      SoundFx.playClink();
+      updateMockPreview();
+    }
+
+    function updateMockPreview() {
+      const address = document.getElementById('mock-address').value || 'Amsterdam';
+      const date = document.getElementById('mock-date').value;
+
+      document.getElementById('preview-trade-title').innerText = currentTrade;
+      document.getElementById('preview-scope').innerText = currentScope;
+      document.getElementById('preview-address').innerText = address;
+      document.getElementById('preview-date').innerText = date;
+      document.getElementById('preview-price').innerText = currentPrice;
+    }
+
+    // 2. Real-time Math Calculator Logic
+    function calculateLoss() {
+      SoundFx.playClink();
+      const profitPerJob = parseFloat(document.getElementById('slider-profit').value);
+      const jobsLostPerMonth = parseFloat(document.getElementById('slider-lost').value);
+      const hoursWastedPerWeek = parseFloat(document.getElementById('slider-hours').value);
+
+      document.getElementById('val-profit').innerText = '€ ' + profitPerJob.toLocaleString('nl-NL');
+      document.getElementById('val-lost').innerText = jobsLostPerMonth + (jobsLostPerMonth === 1 ? ' klus' : ' klussen');
+      document.getElementById('val-hours').innerText = hoursWastedPerWeek + ' uur/week';
+
+      // Calculations
+      const yearlyMoneyLost = profitPerJob * jobsLostPerMonth * 12;
+      const yearlyHoursWasted = hoursWastedPerWeek * 48; // 48 working weeks
+      const yearlyWastedEuro = yearlyHoursWasted * 55; // 55 euro hourly standard
+
+      document.getElementById('stat-money-lost').innerText = '€ ' + yearlyMoneyLost.toLocaleString('nl-NL');
+      document.getElementById('stat-wasted-time').innerText = yearlyHoursWasted + ' uur / € ' + yearlyWastedEuro.toLocaleString('nl-NL');
+
+      // ROI against €75 setup
+      const totalLoss = yearlyMoneyLost + yearlyWastedEuro;
+      const roi = Math.round((totalLoss / 75) * 100);
+      document.getElementById('stat-roi').innerText = roi.toLocaleString('nl-NL') + '%';
+    }
+
+    // 3. Reality Check Quiz Logic
+    let currentQuizStep = 1;
+
+    function answerQuiz(step, option) {
+      SoundFx.playClink();
+      document.getElementById(`q${step}`).classList.add('hidden');
+      
+      if (step < 3) {
+        currentQuizStep = step + 1;
+        document.getElementById(`q${currentQuizStep}`).classList.remove('hidden');
+        document.getElementById('quiz-step-indicator').innerText = currentQuizStep;
+        document.getElementById('quiz-step-title').innerText = `Vraag ${currentQuizStep} van 3`;
+      } else {
+        document.getElementById('quiz-step-indicator').innerText = '✓';
+        document.getElementById('quiz-step-title').innerText = 'Audit Resultaat';
+        document.getElementById('quiz-result').classList.remove('hidden');
+      }
+    }
+
+    function resetQuiz() {
+      document.getElementById('quiz-result').classList.add('hidden');
+      document.getElementById('q1').classList.remove('hidden');
+      document.getElementById('q2').classList.add('hidden');
+      document.getElementById('q3').classList.add('hidden');
+      document.getElementById('quiz-step-indicator').innerText = '1';
+      document.getElementById('quiz-step-title').innerText = 'Vraag 1 van 3';
+    }
+
+    // 4. Express Launch Terminal Form Logic
+    function goToStep(step) {
+      SoundFx.playClink();
+      document.getElementById('form-step-1').classList.add('hidden');
+      document.getElementById('form-step-2').classList.add('hidden');
+      document.getElementById('form-step-3').classList.add('hidden');
+
+      document.getElementById(`form-step-${step}`).classList.remove('hidden');
+
+      for (let i = 1; i <= 3; i++) {
+        const tab = document.getElementById(`step-tab-${i}`);
+        if (i === step) {
+          tab.classList.remove('bg-brand-surface', 'text-slate-400');
+          tab.classList.add('bg-brand-amber', 'text-black');
+        } else {
+          tab.classList.remove('bg-brand-amber', 'text-black');
+          tab.classList.add('bg-brand-surface', 'text-slate-400');
+        }
+      }
+
+      if (step === 3) {
+        const companyName = document.getElementById('order-kvk').value || 'Vakman Onderneming';
+        const contactName = document.getElementById('order-name').value || 'Eigenaar';
+        const phone = document.getElementById('order-phone').value || '06-nummer';
+
+        document.getElementById('summary-company').innerText = companyName;
+        document.getElementById('summary-name').innerText = contactName;
+        document.getElementById('summary-phone').innerText = phone;
+      }
+    }
+
+    function simulateKvkLookup(val) {
+      if (val.length >= 8) {
+        const spinner = document.getElementById('kvk-spinner');
+        spinner.classList.remove('hidden');
+        setTimeout(() => {
+          spinner.classList.add('hidden');
+          const notice = document.getElementById('kvk-autofill-notice');
+          notice.classList.remove('hidden');
+          document.getElementById('kvk-company-name').innerText = `Geverifieerd KvK ${val}: Bouw- & Klusbedrijf geregistreerd`;
+        }, 500);
+      }
+    }
+
+    function simulatePhotoDrop() {
+      SoundFx.playClink();
+      const previewBar = document.getElementById('photo-preview-bar');
+      previewBar.classList.remove('hidden');
+    }
+
+    function handleOrderSubmit(e) {
+      e.preventDefault();
+      SoundFx.playSuccess();
+
+      // Launch Confetti Celebration
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ff6200', '#25D366', '#ffffff']
+      });
+
+      const company = document.getElementById('summary-company').innerText;
+      const contact = document.getElementById('summary-name').innerText;
+      const category = document.getElementById('order-category').value;
+      const minSize = document.getElementById('order-minsize').value;
+      
+      const message = encodeURIComponent(`Hoi AMS-CampusStudio, ik wil mijn website activeren!\n\nBedrijf: ${company}\nContact: ${contact}\nBranche: ${category}\nMinimale klusgrootte: ${minSize}\nGraag binnen 48 uur live.`);
+      document.getElementById('dispatch-wa-link').href = `https://wa.me/31600000000?text=${message}`;
+
+      document.getElementById('order-success-modal').classList.remove('hidden');
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('order-success-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
